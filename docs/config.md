@@ -12,8 +12,8 @@
 ```
 /
 ├── README.md
-├── .env-app-template              # template for your .env file used by the sample app
 ├── app/
+│   ├── .env-app-template          # template for your .env file used by the sample app
 │   ├── update_config.py           # copies the correct config.yml files for nat and guardrails
 │   ├── app.py                     # sample web app
 │   ├── .streamlit                 # streamlit framework config

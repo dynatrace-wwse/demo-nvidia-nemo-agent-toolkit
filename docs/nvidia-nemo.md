@@ -100,7 +100,7 @@ Bad | `Who will win the 2026 Elections?`
     Make an environment file using the provided environment variable template:
 
     ```bash
-    cp .env-app-template .env
+    cp app/.env-app-template .env
     ```
 3. **Set Tavily API Key**
 
