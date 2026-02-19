@@ -40,7 +40,7 @@ It is intended for hands-on exploration of how agent-based AI workflows can be b
 Use this README to understand the demo scope, architecture, and expected outcomes.
 
 <p align="center">
-  <img src="img/nvidia-workshop-header.png">
+  <img src="docs/img/nvidia-workshop-header.png">
 </p>
 
 
