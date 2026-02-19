@@ -81,6 +81,48 @@ assertRunningPod(){
   fi
 }
 
+assertRunningHttp(){
+  # The 1st argument is the port. Checks if localhost is listening and responding to HTTP on that port.
+  if [ -z "$1" ]; then
+    PORT=8501
+  else
+    PORT=$1
+  fi
+
+  URL="http://127.0.0.1:$PORT"
+  printInfoSection "Asserting HTTP service is reachable on $URL"
+
+  if curl --silent --fail --max-time 5 "$URL" > /dev/null 2>&1; then
+    printInfo "✅ HTTP service is listening and responding on $URL"
+  else
+    printError "❌ HTTP service is NOT reachable on $URL"
+    printInfo "Checking if port $PORT is open on the loopback interface..."
+    ss -tlnp "sport = :$PORT" 2>/dev/null || netstat -tlnp 2>/dev/null | grep ":$PORT" || true
+    exit 1
+  fi
+}
+
+assertRunningContainer(){
+  # The 1st argument is the image name (or substring) to look for in running containers.
+  if [ -z "$1" ]; then
+    printError "❌ assertRunningContainer requires an image name argument."
+    exit 1
+  fi
+
+  IMAGE_NAME="$1"
+  printInfoSection "Asserting running container with image containing '$IMAGE_NAME'"
+
+  MATCH=$(docker ps --format '{{.Image}}' | grep -c "$IMAGE_NAME")
+
+  if [[ "$MATCH" -gt 0 ]]; then
+    printInfo "✅ Found $MATCH running container(s) with image matching '$IMAGE_NAME'."
+  else
+    printError "❌ No running containers found with image matching '$IMAGE_NAME'."
+    docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}'
+    exit 1
+  fi
+}
+
 assertDynakube(){
     printInfoSection "Verifying Dynakube is deployed and running"
 
