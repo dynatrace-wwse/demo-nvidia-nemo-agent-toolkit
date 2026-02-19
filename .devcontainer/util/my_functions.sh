@@ -29,7 +29,14 @@ setUpPythonEnv(){
   source $HOME/.local/bin/env
   
   printInfo "Creating and activating Python virtual environment..."
-  uv venv --clear --python 3.13 .venv
+  # On container overlay filesystems (Codespaces/Docker), .venv/lib64 is a symlink.
+  # 'uv venv --clear' calls rmdir() on it → EOVERFLOW (os error 75).
+  # 'rm -rf' may also fail if the symlink blocks traversal, so unlink it explicitly first.
+  if [ -d .venv ]; then
+    find .venv -maxdepth 3 -type l -exec unlink {} \; 2>/dev/null || true
+    rm -rf .venv 2>/dev/null || true
+  fi
+  uv venv --python 3.13 .venv
   source .venv/bin/activate
 
   printInfo "Installing Python dependencies..."
