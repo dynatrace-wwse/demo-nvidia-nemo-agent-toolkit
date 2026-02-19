@@ -101,10 +101,17 @@ start_container() {
     echo "📋 Copying config into container..."
     # docker cp cannot create intermediate directories, so we stage the file in a
     # temp dir matching the target structure, then copy the directory into /etc/.
+    # We explicitly set permissions to 755/644 so that the non-root user inside the
+    # dynatrace-otel-collector container can always traverse the directory and read
+    # the config file. Without this, mktemp creates the parent dir as 700 and the
+    # umask/environment (e.g. Codespaces DooD) can leave the copied path with
+    # overly restrictive permissions → "permission denied" at container startup.
     local tmp_dir
     tmp_dir=$(mktemp -d)
     mkdir -p "${tmp_dir}/otelcol"
     cp "$(pwd)/${config_file}" "${tmp_dir}/otelcol/config.yaml"
+    chmod 755 "${tmp_dir}/otelcol"
+    chmod 644 "${tmp_dir}/otelcol/config.yaml"
     docker cp "${tmp_dir}/otelcol" ${container_name}:/etc/
     rm -rf "${tmp_dir}"
     echo "▶️  Starting container..."
