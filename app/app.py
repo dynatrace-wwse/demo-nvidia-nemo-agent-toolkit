@@ -11,6 +11,12 @@ import sys
 import time
 from pathlib import Path
 
+APP_DIR = Path(__file__).resolve().parent
+REPO_ROOT = APP_DIR.parent
+GUARDRAILS_CONFIG_PATH = APP_DIR / "guardrails_config" / "config.yml"
+NAT_CONFIG_PATH = APP_DIR / "src" / "nat_simple_web_query" / "configs" / "config.yml"
+GUARDRAILS_DIR = APP_DIR / "guardrails_config"
+
 # Suppress Pydantic warnings BEFORE importing libraries that use Pydantic
 warnings.filterwarnings("ignore", message=".*validate_default.*", module="pydantic")
 
@@ -84,8 +90,8 @@ def ensure_config_files_exist():
     print("✓ Ensuring required config files exist...")
 
     # Construct config file paths
-    guardrails_config_path = Path("guardrails_config/config.yml")
-    nat_config_path = Path("src/nat_simple_web_query/configs/config.yml")
+    guardrails_config_path = GUARDRAILS_CONFIG_PATH
+    nat_config_path = NAT_CONFIG_PATH
     
     # Ensure both config files exist
     missing_files = []
@@ -97,7 +103,7 @@ def ensure_config_files_exist():
         print(f"❌ Error: The following config files were not found:")
         for file in missing_files:
             print(f"   - {file}")
-        print(f"   Please run 'python update_config.py <config_type>' to generate config files.")
+        print(f"   Please run 'python app/update_config.py <config_type>' to generate config files.")
         os._exit(1)  # Force immediate exit without cleanup
     
     print("✓ All required config files found")
@@ -111,7 +117,7 @@ def initialize_guardrails():
     print("✓ Initializing guardrails configuration...")
     try:
         # Load guardrails configuration
-        guardrails_path = Path(__file__).parent / "guardrails_config"
+        guardrails_path = GUARDRAILS_DIR
         
         if not guardrails_path.exists():
             print(f"⚠️ Guardrails config not found at: {guardrails_path}")
@@ -402,7 +408,7 @@ def main():
             st.rerun()
         
         # Process query
-        nat_config_path = str(Path(__file__).parent / "src" / "nat_simple_web_query" / "configs" / "config.yml")
+        nat_config_path = str(NAT_CONFIG_PATH)
         if submit_button and user_input.strip():
             if not rails:
                 st.error("❌ Cannot process query: Guardrails not initialized")

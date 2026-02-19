@@ -48,7 +48,7 @@ If you need to restart the sample App, then run the following commands
 ```bash
 cd /workspaces/demo-nvidia-nemo-agent-toolkit
 source .venv/bin/activate
-streamlit run app.py
+streamlit run app/app.py
 ```
 
 ## 📄 Example prompts

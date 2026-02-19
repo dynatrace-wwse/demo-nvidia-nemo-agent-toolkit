@@ -138,16 +138,16 @@ The OpenTelemetry Collector will send observability data to Dynatrace. For this,
 2. **Install dependencies**
 
     ```bash
-    uv pip install -r requirements.txt
+    uv pip install -r app/requirements.txt
     ```
 
 3. **Update the NVIDIA configuration files**
     
-    This script will create the `guardrails_config/config.yml` and `src/configs/config.yml` files from the provided template for NVIDIA build API usage required for NVIDIA NAT and Guardrail usage.
+    This script will create the `app/guardrails_config/config.yml` and `app/src/nat_simple_web_query/configs/config.yml` files from the provided template for NVIDIA build API usage required for NVIDIA NAT and Guardrail usage.
 
     ```bash
     source .env
-    python update_config.py build
+    python app/update_config.py build
     ```
 
 4. **Start sample App**
@@ -155,7 +155,7 @@ The OpenTelemetry Collector will send observability data to Dynatrace. For this,
     This will start a web app on port `8501` for example `http://localhost:8501`
 
     ```bash
-    streamlit run app.py
+    streamlit run app/app.py
     ```
 
 5. **Open App**

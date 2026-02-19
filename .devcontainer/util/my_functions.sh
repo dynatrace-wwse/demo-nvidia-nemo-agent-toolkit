@@ -5,6 +5,8 @@
 #  needed.                                                             #
 # ======================================================================
 
+APP_DIR="$REPO_PATH/app"
+
 
 customFunction(){
   printInfoSection "This is a custom function that calculates 1 + 1"
@@ -16,7 +18,17 @@ customFunction(){
 startApp(){
   printInfoSection "Starting application"
   printInfo "Launching Streamlit application..."
-  streamlit run app.py
+
+  if [ -x "$REPO_PATH/.venv/bin/python3" ]; then
+    "$REPO_PATH/.venv/bin/python3" -m streamlit run "$APP_DIR/app.py"
+  elif command -v python3 >/dev/null 2>&1; then
+    python3 -m streamlit run "$APP_DIR/app.py"
+  elif command -v streamlit >/dev/null 2>&1; then
+    streamlit run "$APP_DIR/app.py"
+  else
+    printError "Could not find Python/Streamlit runtime. Run setUpPythonEnv first."
+    return 1
+  fi
 }
 
 setUpPythonEnv(){
@@ -26,7 +38,9 @@ setUpPythonEnv(){
   printInfo "Downloading & installing Python project manager Astral UV..."
   curl -LsSf https://astral.sh/uv/install.sh | sh
 
-  source $HOME/.local/bin/env
+  if [ -f "$HOME/.local/bin/env" ]; then
+    source "$HOME/.local/bin/env"
+  fi
   
   printInfo "Creating and activating Python virtual environment..."
   # On container overlay filesystems (Codespaces/Docker), .venv/lib64 is a symlink.
@@ -44,14 +58,14 @@ setUpPythonEnv(){
   export UV_HTTP_TIMEOUT=300
   # Suppress UV hardlink warning for cross-filesystem operations
   export UV_LINK_MODE=copy
-  if ! uv pip install -r requirements.txt; then
+  if ! uv pip install -r "$APP_DIR/requirements.txt"; then
     printError "Failed to install Python dependencies. "
-    printError "Please check requirements.txt and try again."
+    printError "Please check app/requirements.txt and try again."
     return 1
   fi
 
   printInfo "Updating Python configuration files..."
-  python update_config.py build
+  python "$APP_DIR/update_config.py" build
 }
 
 startOtelCollector(){

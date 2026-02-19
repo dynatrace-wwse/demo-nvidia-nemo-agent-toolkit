@@ -10,9 +10,9 @@ It performs two main operations:
    from environment variables
 
 Usage:
-    python update_config.py local   # Copies config.yml.local → config.yml
-    python update_config.py build   # Copies config.yml.build → config.yml
-    python update_config.py brev    # Copies config.yml.brev → config.yml and replaces placeholders
+    python app/update_config.py local   # Copies config.yml.local → config.yml
+    python app/update_config.py build   # Copies config.yml.build → config.yml
+    python app/update_config.py brev    # Copies config.yml.brev → config.yml and replaces placeholders
 
 Environment Variables (required for 'brev' config type):
     - NVIDIA_MODEL_ENDPOINT_8001: Main LLM endpoint URL
@@ -21,14 +21,17 @@ Environment Variables (required for 'brev' config type):
     - NVIDIA_MODEL_ENDPOINT_8004: Additional model endpoint URL
 
 Config File Locations:
-    - guardrails_config/config.yml
-    - src/nat_simple_web_query/configs/config.yml
+    - app/guardrails_config/config.yml
+    - app/src/nat_simple_web_query/configs/config.yml
 """
 
 import argparse
 import os
 import shutil
 from pathlib import Path
+
+APP_DIR = Path(__file__).resolve().parent
+REPO_ROOT = APP_DIR.parent
 
 def copy_config_template(config_type):
     """Copy config template files to active config.yml based on config type."""
@@ -44,8 +47,8 @@ def copy_config_template(config_type):
         exit(1)
     
     # Define config directories
-    guardrails_dir = Path("guardrails_config")
-    nat_dir = Path("src/nat_simple_web_query/configs")
+    guardrails_dir = APP_DIR / "guardrails_config"
+    nat_dir = APP_DIR / "src" / "nat_simple_web_query" / "configs"
     
     # Copy template files to config.yml
     for config_dir in [guardrails_dir, nat_dir]:
@@ -62,8 +65,8 @@ def copy_config_template(config_type):
 def update_brev_endpoint(config_type):
 
     # Construct config file paths
-    guardrails_config_path = Path(f"guardrails_config/config.yml")
-    nat_config_path = Path(f"src/nat_simple_web_query/configs/config.yml")
+    guardrails_config_path = APP_DIR / "guardrails_config" / "config.yml"
+    nat_config_path = APP_DIR / "src" / "nat_simple_web_query" / "configs" / "config.yml"
     
     # Check if all required environment variables are set
     required_vars = ["NVIDIA_MODEL_ENDPOINT_8001","NVIDIA_MODEL_ENDPOINT_8002", 

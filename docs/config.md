@@ -12,27 +12,16 @@
 ```
 /
 ├── README.md
-├── update_config.py               # copies the correct config.yml files for nat and guardrails
-├── app.py                         # sample web app
-├── .env-app-template              # template for your .env file used by app.py
-├── .streamlit                     # folder used by streamlit web framework
-│   └── config.toml                # streamlit config file
-│
-├── nat_config/
-│   ├── __init__.py
-│   ├── register.py                # NAT component registration
-│   ├── guarded_workflow.py        # Guardrails wrapper class
-│   └── configs/
-│       └── config.yml.build       # Reference config.yml to use the build APIs
-│       ├── config.yml.brev        # Reference config.yml to use local model accessable via public endpoints
-│       └── config.yml.local       # Reference config.yml to use the local use of Docker NIMs
-|
-├── guardrails_config/
-│   ├── config.yml.build           # Reference config.yml to use the build APIs
-│   ├── config.yml.brev            # Reference config.yml to use local model accessable via public endpoints
-│   ├── config.yml.local           # Reference config.yml to use the local use of Docker NIMs
-│   ├── prompts.yml                # Validation prompts
-│   └── actions.py                 # Custom validation functions
+├── .env-app-template              # template for your .env file used by the sample app
+├── app/
+│   ├── update_config.py           # copies the correct config.yml files for nat and guardrails
+│   ├── app.py                     # sample web app
+│   ├── .streamlit                 # streamlit framework config
+│   │   └── config.toml
+│   ├── src/
+│   │   └── nat_simple_web_query/  # NAT component registration and workflow
+│   ├── guardrails_config/          # NeMo Guardrails config, prompts, and actions
+│   └── nim/                       # local NIM scripts and docs
 │
 ├── otel/
 │   ├── README.md                  # setup guide for starting up an Otel Collector
@@ -43,18 +32,12 @@
 │   ├── start-otel.sh              # script to start OTel collector
 │   └── stop-otel.sh               # script to stop OTel collector
 │
-├── nim/                           # Only for when running NIMs locally with Docker
-│   ├── README.md                  # setup guide 
-│   ├── .env-nim-template          # template for your .env file used by docker run command
-│   ├── start-nim.sh               # script to start NIM containers
-│   └── stop-nim.sh                # script to stop NIM containers
-│
 └── .devcontainer/                 # Only for workshop when dev containers where used
 ```
 
 ## 🔧 NVIDIA Configuration
 
-### NAT Workflow Configuration (`src/nat_simple_web_query/configs`)
+### NAT Workflow Configuration (`app/src/nat_simple_web_query/configs`)
 
 - **Purpose:** Defines the ReAct agent, tools, LLMs, and embedders
 - **Key Settings:**
@@ -67,13 +50,13 @@
 
 ### Guardrails Configuration
 
-#### Main Config (`guardrails_config/config.yml`)
+#### Main Config (`app/guardrails_config/config.yml`)
 - **Models:** NVIDIA NeMoGuard for content safety
 - **instructions:** Additional prompt context
 - **Input Flows:** Input guard rail checks
 - **Output Flows:** Output guard rail checks
 
-#### Custom Actions (`guardrails_config/actions.py`)
+#### Custom Actions (`app/guardrails_config/actions.py`)
 Defines logic for each guardrail action
 - `check_jailbreak()` - Detects 12+ jailbreak patterns
 - `check_blocked_terms()` - Term-based filtering
@@ -82,12 +65,12 @@ Defines logic for each guardrail action
 - `check_input_topic()` - Topic validation with keyword matching
 - `check_output_relevance()` - Ensures focused responses
 
-#### Colang Flows (`guardrails_config/flows.co`)
+#### Colang Flows (`app/guardrails_config/flows.co`)
 - Defines control flow logic for each guardrail
 - Specifies refusal messages for different violation types
 - Implements `stop` directives to halt processing
 
-#### Prompts (`guardrails_config/prompts.yml`)
+#### Prompts (`app/guardrails_config/prompts.yml`)
 - Content safety validation templates
 - Self-check prompts for input/output validation
 - Output parsers and token limits
