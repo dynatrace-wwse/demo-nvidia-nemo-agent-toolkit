@@ -52,5 +52,4 @@ Use this README to understand the demo scope, architecture, and expected outcome
 
 ## 📚 Documentation
 
-For setup, usage, and implementation details, visit the [GitHub Pages documentation](https://dynatrace-wwse.github.io/demo-nvidia-nemo-agent-toolkit) or browse the [docs/](docs/) folder.
-g
+For setup, usage, and implementation details, visit the [GitHub Pages documentation](https://dynatrace-wwse.github.io/demo-nvidia-nemo-agent-toolkit)
