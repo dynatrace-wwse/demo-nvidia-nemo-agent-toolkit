@@ -27,15 +27,24 @@
 
 ___
 
-This is a template so you as a professor can create fun and interesting enablements in no time.
+## 🚀 Demo Overview
 
-In this README you should add a brief description of the project. What will the student learn, which technologies and/or solutions. 
+This repository is a **demo project** showcasing the **NVIDIA NeMo Agent Toolkit** with **Dynatrace integration**.
 
-Ready to learn how to create an enablement using codespaces? 
-## [👨‍🏫 Learn how to create enablements in Codespaces!](https://dynatrace-wwse.github.io/demo-nvidia-nemo-agent-toolkit)
+It is intended for hands-on exploration of how agent-based AI workflows can be built, run, and observed in a practical setup. With this demo, you can:
 
-<!-- Documentation has been moved to the docs/ folder -->
+- run and inspect an agent-based AI implementation using NVIDIA NeMo Agent Toolkit  
+- observe behavior, telemetry, and AI monitoring signals with Dynatrace  
+- use a structured example that can be adapted for workshops, demos, or technical walkthroughs  
 
-## 📖 Full Documentation
+Use this README to understand the demo scope, architecture, and expected outcomes.
 
-For full documentation including setup, usage, and local installation instructions, visit the [GitHub Pages site](https://dynatrace-wwse.github.io/demo-nvidia-nemo-agent-toolkit) or browse the [docs/](docs/) folder.
+<p align="center">
+  <img src="img/nvidia-workshop-header.png">
+</p>
+
+
+
+## 📚 Documentation
+
+For setup, usage, and implementation details, visit the [GitHub Pages documentation](https://dynatrace-wwse.github.io/demo-nvidia-nemo-agent-toolkit) or browse the [docs/](docs/) folder.
