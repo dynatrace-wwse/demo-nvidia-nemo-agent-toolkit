@@ -29,7 +29,7 @@ setUpPythonEnv(){
   source $HOME/.local/bin/env
   
   printInfo "Creating and activating Python virtual environment..."
-  uv venv --python 3.13 .venv
+  uv venv --clear --python 3.13 .venv
   source .venv/bin/activate
 
   printInfo "Installing Python dependencies..."
