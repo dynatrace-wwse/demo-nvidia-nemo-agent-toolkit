@@ -41,13 +41,20 @@ start_container() {
     
     # Container doesn't exist, create and start it based on config type
     echo "🔄 Starting dynatrace-otel-collector container with ${config_file}..."
-    
+
+    # We use docker create + docker cp + docker start instead of a bind mount (-v).
+    # Bind mounts pass the path to the HOST Docker daemon, but $(pwd) resolves to
+    # the container-internal path (e.g. /workspaces/...), which doesn't exist on the
+    # host. Docker then silently creates a directory there and mounts it, causing:
+    #   "read /etc/otelcol/config.yaml: is a directory"
+    # docker cp copies from the current filesystem (where $(pwd) is valid), so it
+    # works correctly under both DooD (Codespaces) and local (make start) scenarios.
+
     case "$config_file" in
         config.yaml)
             echo "Starting with config.yaml..."
             echo "DT_BASE_URL = $DT_BASE_URL"
-            echo "Container = "
-            docker run -d --rm -v "$(pwd)"/${config_file}:/etc/otelcol/config.yaml \
+            docker create \
             --name ${container_name} \
             -e DT_BASE_URL=$DT_BASE_URL \
             -e DT_API_TOKEN=$DT_API_TOKEN \
@@ -60,8 +67,7 @@ start_container() {
             echo "DT_BASE_URL = $DT_BASE_URL"
             echo "DCGM_HOST = $DCGM_HOST"
             echo "DCGM_PORT = $DCGM_PORT"
-            echo "Container = "
-            docker run -d --rm -v "$(pwd)"/${config_file}:/etc/otelcol/config.yaml \
+            docker create \
             --name ${container_name} \
             -e DT_BASE_URL=$DT_BASE_URL \
             -e DT_API_TOKEN=$DT_API_TOKEN \
@@ -76,8 +82,7 @@ start_container() {
             echo "DT_BASE_URL = $DT_BASE_URL"
             echo "DCGM_PORT = $DCGM_PORT"
             echo "NIM_HOST = $NIM_HOST"
-            echo "Container = "
-            docker run -d --rm -v "$(pwd)"/${config_file}:/etc/otelcol/config.yaml \
+            docker create \
             --name ${container_name} \
             -e DT_BASE_URL=$DT_BASE_URL \
             -e DT_API_TOKEN=$DT_API_TOKEN \
@@ -92,6 +97,18 @@ start_container() {
             dynatrace/dynatrace-otel-collector:latest
             ;;
     esac
+
+    echo "📋 Copying config into container..."
+    # docker cp cannot create intermediate directories, so we stage the file in a
+    # temp dir matching the target structure, then copy the directory into /etc/.
+    local tmp_dir
+    tmp_dir=$(mktemp -d)
+    mkdir -p "${tmp_dir}/otelcol"
+    cp "$(pwd)/${config_file}" "${tmp_dir}/otelcol/config.yaml"
+    docker cp "${tmp_dir}/otelcol" ${container_name}:/etc/
+    rm -rf "${tmp_dir}"
+    echo "▶️  Starting container..."
+    docker start ${container_name}
     
     echo ""
 }
