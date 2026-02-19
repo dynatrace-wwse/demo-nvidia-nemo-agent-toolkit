@@ -6,10 +6,13 @@ source .devcontainer/util/source_framework.sh
 setUpTerminal
 
 verifyEnvironmentVars
-#TODO: BeforeGoLive: uncomment this. This is only needed for professors to have the Mkdocs live in the container
+
+startOtelCollector
+
+setUpPythonEnv
+
+startApp
+
 finalizePostCreation
 
 printInfoSection "Your dev container finished creating"
-
-
-

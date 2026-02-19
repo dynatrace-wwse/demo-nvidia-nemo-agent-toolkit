@@ -194,12 +194,5 @@ fi
 echo "export TAVILY_API_KEY=\"$TAVILY_API_KEY\"" >> ~/.bashrc
 
 
-startOtelCollector
 
-setUpPythonEnv
-
-printInfo "Codespace setup complete."
-printInfo "Dynatrace API URL is: $DT_BASE_URL"
-
-startApp
 }
