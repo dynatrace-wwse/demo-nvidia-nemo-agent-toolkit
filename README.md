@@ -26,9 +26,18 @@
 
 ___
 
+<p align="center">
+  <img src="docs/img/nvidia-workshop-header.png">
+</p>
+
 ## 🚀 Demo Overview
 
 This repository is a **demo project** showcasing the **NVIDIA NeMo Agent Toolkit** with **Dynatrace integration**.
+
+<p align="center">
+  <img src="docs/img/dt-nvidia.png" width="50%">
+</p>
+
 
 It is intended for hands-on exploration of how agent-based AI workflows can be built, run, and observed in a practical setup. With this demo, you can:
 
@@ -38,9 +47,6 @@ It is intended for hands-on exploration of how agent-based AI workflows can be b
 
 Use this README to understand the demo scope, architecture, and expected outcomes.
 
-<p align="center">
-  <img src="docs/img/nvidia-workshop-header.png">
-</p>
 
 
 
