@@ -1,6 +1,6 @@
 --8<-- "snippets/3-codespaces.js"
 
---8<-- "snippets/dt-enablement.md"
+
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/dynatrace-wwse/enablement-codespaces-template){target="_blank"}
 

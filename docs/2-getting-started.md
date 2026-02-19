@@ -1,35 +1,22 @@
 --8<-- "snippets/getting-started.js"
 --8<-- "snippets/grail-requirements.md"
 
-## 1. Prerequisites before launching the Codespace
+## Prerequisites
 
-TODO: Place the prerequisites and everything that is needed before launching the codespace. 
+This repo and related guides assume Mac OS/Linux, but you can adapt as required for Windows.
 
-As a Professor we highly recommend to install VSCode locally and always open the devcontainer from it, specially since we'll be using some plugins for enhancing the productivity and your experience while building trainings. 
+1. NVIDIA Build Account on [build.nvidia.com](https://build.nvidia.com)
+1. Tavily Developer Account on [tavily.com](https://www.tavily.com)
+1. Dynatrace Tenant. For a Trial, visit [Dynatrace signup page](https://www.dynatrace.com/signup/)
+1. [Dynatrace API Token](https://docs.dynatrace.com/docs/dynatrace-api/basics/dynatrace-api-authentication#create-token) with the required scopes for the OTLP Ingest API:
+    * `openTelemetryTrace.ingest`
+    * `metrics.ingest`
+    * `logs.ingest`
 
-
-### 1.1 Download Visual Studio Code
-
-- Go to  [https://code.visualstudio.com](https://code.visualstudio.com), download and install Visual Studio on your machine. 
-
-
-!!! tip "Tipp"
-    Working on a local Visual Studio Code, maximizes your productivity, you'll be able to connect to dev.containers remotely, locally, install plugins, and much more.
-
-
-### 1.2 Install the TODO Tree VS Code extension. 
-
-We'll be guiding you with TODOs to write your first hands-on trainig.
-- Click on the extensions tab
-- Search for "Todo tree"
-- Click on it and install it
-
-![todo](img/todo.png){: style="width: 400px;"}
-
-Once installed, you'll see on the left menu bar, the Tree icon. When you click on it, a pane with TODO task will open, this tasks will guide you to write your training, remove each of them and the code or text that needs to be replace once completed. Like this page 😉. 
-
-!!! tip "Let's launch the Codespace"
-    Now we are ready to launch the Codespace! 
+If you are not using GitHub codespaces and want to install and run locally, then you will also need:
+- Python 3.11, 3.12, or 3.13 
+- Python package and project manager, [uv](https://docs.astral.sh/uv/getting-started/installation/)
+- Docker or Podman for containerized deployment of a OpenTelemetry Collector 
 
 
 <div class="grid cards" markdown>

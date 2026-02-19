@@ -1,4 +1,4 @@
-<img alt="Workshop" src="static/nvidia-workshop-header.png">
+![Workshop](img/nvidia-workshop-header.png)
 
 This 90-minute instructor-led session where you'll explore a chat-bot app built with NVIDIA NeMo for training, safety and optimization, and NVIDIA NIM GPU-accelerated inference microservices for AI models. Learn how to use NeMo Agent Toolkit for coordinating and profiling agent workflows; and NeMo Guardrails to keep agentic AI applications reliable and aligned. 
 
@@ -6,7 +6,7 @@ With Dynatrace monitoring, you'll track real-time performance and cost, follow e
 
 ## Setup
 
-<img alt="Workshop setup" src="static/selfguided-setup.png" width="75%">
+![Workshop setup](img/selfguided-setup.png){ width="75%";}
 
 ## 🔧 Start GitHub Codespace
 
@@ -18,7 +18,7 @@ With Dynatrace monitoring, you'll track real-time performance and cost, follow e
 
     From this repo, startup a codespace environment with the `new with options` option.  Critcal to enter the `WORKSHOP_PASSWORD` provided by the insructor.  
 
-    <img alt="Workshop setup" src="static/codespace-create.png" width="75%">
+    ![Workshop setup](img/codespace-create.png){ width="75%";}
 
 3. **Verify Start codespace**
 
@@ -30,7 +30,7 @@ With Dynatrace monitoring, you'll track real-time performance and cost, follow e
     
     Once codespace is completed the startup, you should see this:
 
-    <img alt="Workshop setup" src="static/codespace-complete.png" width="75%">
+    ![Workshop setup](img/codespace-complete.png){ width="75%";}
 
 3. **View app in browser**
 
@@ -38,7 +38,7 @@ With Dynatrace monitoring, you'll track real-time performance and cost, follow e
 
     To view app, follow this guide:
 
-    <img alt="Workshop setup" src="static/codespace-open-app.png" width="75%">
+    ![Workshop setup](img/codespace-open-app.png){ width="75%";}
 
 
 ## 🚀 Run the Application locally using Python
