@@ -13,4 +13,4 @@ echo "Checking 8004..."
 curl http://localhost:8004/v1/health/ready
 echo ""
 echo ""
-echo """✅ Health checks complete."
+echo "✅ Health checks complete."

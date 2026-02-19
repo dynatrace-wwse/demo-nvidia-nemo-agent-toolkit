@@ -16,7 +16,7 @@ With Dynatrace monitoring, you'll track real-time performance and cost, follow e
 
 2. **Start codespace**
 
-    From this repo, startup a codespace environment with the `new with options` option.  Critcal to enter the `WORKSHOP_PASSWORD` provided by the insructor.  
+    From this repo, startup a codespace environment with the `new with options` option.  Critical to enter the `WORKSHOP_PASSWORD` provided by the instructor.  
 
     <img alt="Workshop setup" src="static/codespace-create.png" width="75%">
 
