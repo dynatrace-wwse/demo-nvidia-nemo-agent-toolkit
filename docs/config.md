@@ -50,6 +50,18 @@
 
 ### Guardrails Configuration
 
+#### Directory Structure (`app/guardrails_config/`)
+
+```
+guardrails_config/
+├── config.yml           # active guardrails config (copied by update_config.py)
+├── config.yml.brev      # config variant for Brev/cloud GPU environments
+├── config.yml.build     # config variant for NVIDIA build API endpoints
+├── actions.py           # custom Python guardrail action implementations
+├── flows.co             # Colang flow definitions for guardrail logic
+└── prompts.yml          # prompt templates for content safety validation
+```
+
 #### Main Config (`app/guardrails_config/config.yml`)
 - **Models:** NVIDIA NeMoGuard for content safety
 - **instructions:** Additional prompt context

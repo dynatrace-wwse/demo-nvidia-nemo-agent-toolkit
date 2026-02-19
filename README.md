@@ -1,13 +1,14 @@
 <!-- markdownlint-disable-next-line -->
 <!-- Notes to Self
-[ ] migrate repo
-[ ] check that works
-[ ] refactor tenant ENV var
-[ ] clean and move app to folder, clean architecture
-[ ] clean and move images and docs to folder
+[x] migrate repo
+[x] check that works
+[x] clean and move app to folder, clean architecture
+[x] clean and move images and docs to folder
+[x] add RUM 
+[x] move docs to gh pages
+
 [ ] add integration tests
-[ ] add RUM 
-[ ] move docs to gh pages
+[ ] refactor tenant ENV var
 [ ] protect branch with git strategy
 [ ] version policy
 
