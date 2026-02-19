@@ -1,0 +1,35 @@
+# Enable the exporting of traces via OpenTelemetry
+general:
+  telemetry:
+    tracing:
+      otelcollector:
+        _type: otelcollector
+        # The endpoint where you have deployed the otel collector
+        endpoint: "${OTEL_OTLP_ENDPOINT:-http://localhost:4318}/v1/traces"
+        project: "nat_workflow${GITHUB_USER:+-${GITHUB_USER}}"
+
+functions:
+  web_search:
+    _type: tavily_internet_search
+    description: "Search the web for current information. Use this tool for any questions that require up-to-date information from the internet."
+    max_results: 5
+  current_datetime:
+    _type: current_datetime
+
+llms:
+  nim_llm:
+    _type: nim
+    model_name: meta/llama-3.1-70b-instruct
+    temperature: 0.1
+
+embedders:
+  nv-embedqa-e5-v5:
+    _type: nim
+    model_name: nvidia/nv-embedqa-e5-v5
+
+workflow:
+  _type: react_agent
+  tool_names: [web_search, current_datetime]
+  llm_name: nim_llm
+  verbose: false
+  parse_agent_response_max_retries: 3

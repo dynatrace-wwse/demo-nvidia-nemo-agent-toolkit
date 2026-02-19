@@ -1,41 +1,210 @@
-#!/bin/bash
-#loading functions to script
-export SECONDS=0
-source .devcontainer/util/source_framework.sh
+# Adjust to build, brev or local
+if [ -z "$APP_MODE" ] || [ "$APP_MODE" = "null" ]; then
+  export APP_MODE=build
+fi
+# Validate APP_MODE is one of the allowed values
+if [ "$APP_MODE" != "local" ] && [ "$APP_MODE" != "brev" ] && [ "$APP_MODE" != "build" ]; then
+  echo "Error ***************************************************************"
+  echo "Error ***************************************************************"
+  echo ""
+  echo "Error: APP_MODE must be 'local', 'brev', or 'build'."
+  echo "Current value: $APP_MODE"
+  echo ""
+  echo "Error ***************************************************************"
+  echo "Error ***************************************************************"
+  return 1
+fi
+echo "APP_MODE is set to: $APP_MODE"
 
-setUpTerminal
+##############################################################################
+# Setup Environment Variables
+##############################################################################
 
-startKindCluster
+# Adjust as required for using server to workshop environment variables.  
+# Leave blank if not running a workshop
+WORKSHOP_URL=
+if [ "$WORKSHOP_URL" ] ; then
+  echo "Getting the workshop environment settings..."
 
-installK9s
+  # Verify that environment variables were retrieved successfully
+  if [ -z "$WORKSHOP_PASSWORD" ] || [ "$WORKSHOP_PASSWORD" = "null" ]; then
+    echo "Error ***************************************************************"
+    echo "Error ***************************************************************"
+    echo ""
+    echo "Error: WORKSHOP_PASSWORD is not set or is null."
+    echo "Please check your WORKSHOP_PASSWORD and try again."
+    echo ""
+    echo "Error ***************************************************************"
+    echo "Error ***************************************************************"
+    return 1
+  fi
+  echo "You entered a WORKSHOP_PASSWORD of: ${WORKSHOP_PASSWORD}"
 
-#TODO: BeforeGoLive: uncomment this. This is only needed for professors to have the Mkdocs live in the container
+  export DT_BASE_URL=$(curl -s -X POST $WORKSHOP_URL/dynatrace-url \
+    -H "Content-Type: application/json" \
+    -d "{\"password\": \"$WORKSHOP_PASSWORD\"}" | jq -r '.dynatrace_url')
 
-#installMkdocs
+  export DT_API_TOKEN=$(curl -s -X POST $WORKSHOP_URL/dynatrace-token \
+    -H "Content-Type: application/json" \
+    -d "{\"password\": \"$WORKSHOP_PASSWORD\"}" | jq -r '.dynatrace_api_token')
 
+  export NVIDIA_API_KEY=$(curl -s -X POST $WORKSHOP_URL/nvidia-key \
+    -H "Content-Type: application/json" \
+    -d "{\"password\": \"$WORKSHOP_PASSWORD\"}" | jq -r '.nvidia_api_key')
 
-# Dynatrace Operator can be deployed automatically
-#dynatraceDeployOperator
+  export TAVILY_API_KEY=$(curl -s -X POST $WORKSHOP_URL/tavily-key \
+    -H "Content-Type: application/json" \
+    -d "{\"password\": \"$WORKSHOP_PASSWORD\"}" | jq -r '.tavily_api_key')
 
-# You can deploy CNFS or AppOnly
-#deployCloudNative
-#deployApplicationMonitoring
+  export OTEL_OTLP_ENDPOINT=$(curl -s -X POST $WORKSHOP_URL/otel-endpoint \
+    -H "Content-Type: application/json" \
+    -d "{\"password\": \"$WORKSHOP_PASSWORD\"}" | jq -r '.otel_otlp_endpoint')
 
-# In here you deploy the Application you want
-# The TODO App will be deployed as a sample
-deployTodoApp
+  export NVIDIA_MODEL_ENDPOINT_8001=$(curl -s -X POST $WORKSHOP_URL/nvidia-model-endpoint-8001 \
+    -H "Content-Type: application/json" \
+    -d "{\"password\": \"$WORKSHOP_PASSWORD\"}" | jq -r '.nvidia_model_endpoint_8001')
 
-# The Astroshop keeping changes of demo.live needs certmanagerdocker
-#certmanagerInstall
-#certmanagerEnable
-#deployAstroshop
+  export NVIDIA_MODEL_ENDPOINT_8002=$(curl -s -X POST $WORKSHOP_URL/nvidia-model-endpoint-8002 \
+    -H "Content-Type: application/json" \
+    -d "{\"password\": \"$WORKSHOP_PASSWORD\"}" | jq -r '.nvidia_model_endpoint_8002')
 
-# If you want to deploy your own App, just create a function in the functions.sh file and call it here.
-# deployMyCustomApp
+  export NVIDIA_MODEL_ENDPOINT_8003=$(curl -s -X POST $WORKSHOP_URL/nvidia-model-endpoint-8003 \
+    -H "Content-Type: application/json" \
+    -d "{\"password\": \"$WORKSHOP_PASSWORD\"}" | jq -r '.nvidia_model_endpoint_8003')
 
-# If the Codespace was created via Workflow end2end test will be done, otherwise
-# it'll verify if there are error in the logs and will show them in the greeting as well a monitoring 
-# notification will be sent on the instantiation details
-finalizePostCreation
+  export NVIDIA_MODEL_ENDPOINT_8004=$(curl -s -X POST $WORKSHOP_URL/nvidia-model-endpoint-8004 \
+    -H "Content-Type: application/json" \
+    -d "{\"password\": \"$WORKSHOP_PASSWORD\"}" | jq -r '.nvidia_model_endpoint_8004')
+fi
 
-printInfoSection "Your dev container finished creating"
+# get the NVIDIA model endpoints if in brev or local mode
+if [ "$APP_MODE" = "brev" ] || [ "$APP_MODE" = "local" ]  ; then
+  echo "Setting NVIDIA_MODEL_ENDPOINTs for $APP_MODE mode..."
+
+  if [ -z "$NVIDIA_MODEL_ENDPOINT_8001" ] || [ "$NVIDIA_MODEL_ENDPOINT_8001" = "null" ]; then
+    echo "Error ***************************************************************"
+    echo "Error ***************************************************************"
+    echo ""
+    echo "Error: Failed to retrieve NVIDIA_MODEL_ENDPOINT_8001."
+    echo ""
+    echo "Error ***************************************************************"
+    echo "Error ***************************************************************"
+    return 1
+  fi
+  echo "NVIDIA_MODEL_ENDPOINT_8001=$NVIDIA_MODEL_ENDPOINT_8001"
+  echo "NVIDIA_MODEL_ENDPOINT_8002=$NVIDIA_MODEL_ENDPOINT_8002"
+  echo "NVIDIA_MODEL_ENDPOINT_8003=$NVIDIA_MODEL_ENDPOINT_8003"
+  echo "NVIDIA_MODEL_ENDPOINT_8004=$NVIDIA_MODEL_ENDPOINT_8004"
+  echo "export NVIDIA_MODEL_ENDPOINT_8001=\"$NVIDIA_MODEL_ENDPOINT_8001\"" >> ~/.bashrc
+  echo "export NVIDIA_MODEL_ENDPOINT_8002=\"$NVIDIA_MODEL_ENDPOINT_8002\"" >> ~/.bashrc
+  echo "export NVIDIA_MODEL_ENDPOINT_8003=\"$NVIDIA_MODEL_ENDPOINT_8003\"" >> ~/.bashrc
+  echo "export NVIDIA_MODEL_ENDPOINT_8004=\"$NVIDIA_MODEL_ENDPOINT_8004\"" >> ~/.bashrc
+fi
+
+# get using the NVIDIA Build APIs, then get the API key
+if [ "$APP_MODE" = "build" ] ; then
+  echo "Setting NVIDIA_API_KEY"
+  if [ -z "$NVIDIA_API_KEY" ] || [ "$NVIDIA_API_KEY" = "null" ]; then
+    echo "Error ***************************************************************"
+    echo "Error ***************************************************************"
+    echo ""
+    echo "Error: Failed to retrieve NVIDIA_API_KEY. "
+    echo ""
+    echo "Error ***************************************************************"
+    echo "Error ***************************************************************"
+    return 1
+  fi
+  echo "export NVIDIA_API_KEY=\"$NVIDIA_API_KEY\"" >> ~/.bashrc
+fi
+
+echo "Setting Dynatrace DT_BASE_URL=$DT_BASE_URL"
+if [ -z "$DT_BASE_URL" ] || [ "$DT_BASE_URL" = "null" ]; then
+  echo "Error ***************************************************************"
+  echo "Error ***************************************************************"
+  echo ""
+  echo "Error: Failed to retrieve DT_BASE_URL. "
+  echo ""
+  echo "Error ***************************************************************"
+  echo "Error ***************************************************************"
+  return 1
+fi
+if [ -z "$DT_API_TOKEN" ] || [ "$DT_API_TOKEN" = "null" ]; then
+  echo "Error ***************************************************************"
+  echo "Error ***************************************************************"
+  echo ""
+  echo "Error: Failed to retrieve DT_API_TOKEN. "
+  echo ""
+  echo "Error ***************************************************************"
+  echo "Error ***************************************************************"
+  return 1
+fi
+echo "export DT_BASE_URL=\"$DT_BASE_URL\"" >> ~/.bashrc
+echo "export DT_API_TOKEN=\"$DT_API_TOKEN\"" >> ~/.bashrc
+
+echo "Setting TAVILY_API_KEY"
+if [ -z "$TAVILY_API_KEY" ] || [ "$TAVILY_API_KEY" = "null" ]; then
+  echo "Error ***************************************************************"
+  echo "Error ***************************************************************"
+  echo ""
+  echo "Error: Failed to retrieve TAVILY_API_KEY. "
+  echo ""
+  echo "Error ***************************************************************"
+  echo "Error ***************************************************************"
+  return 1
+fi
+echo "export TAVILY_API_KEY=\"$TAVILY_API_KEY\"" >> ~/.bashrc
+
+if [ -z "$OTEL_OTLP_ENDPOINT" ] || [ "$OTEL_OTLP_ENDPOINT" = "null" ]; then
+  export OTEL_OTLP_ENDPOINT="http://localhost:4318"
+fi
+echo "Setting OTEL_OTLP_ENDPOINT=$OTEL_OTLP_ENDPOINT"
+echo "export OTEL_OTLP_ENDPOINT=\"$OTEL_OTLP_ENDPOINT\"" >> ~/.bashrc
+
+##############################################################################
+# Start Otel Collector
+##############################################################################
+echo "Starting up Otel Collector..."
+cd otel
+./start-otel.sh
+cd ..
+
+##############################################################################
+# Setup Python Environment
+##############################################################################
+echo "Setting up Python environment..."
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+echo "Creating and activating Python virtual environment..."
+uv venv --python 3.13 .venv
+source .venv/bin/activate
+
+echo "Installing Python dependencies..."
+# Increase UV HTTP timeout to handle slower connections
+export UV_HTTP_TIMEOUT=300
+# Suppress UV hardlink warning for cross-filesystem operations
+export UV_LINK_MODE=copy
+if ! uv pip install -r requirements.txt; then
+  echo "Error ***************************************************************"
+  echo "Error ***************************************************************"
+  echo ""
+  echo "Error: Failed to install Python dependencies. "
+  echo "Please check requirements.txt and try again."
+  echo ""
+  echo "Error ***************************************************************"
+  echo "Error ***************************************************************"
+  return 1
+fi
+
+echo "Updating configuration files..."
+python update_config.py build
+
+echo ""
+echo "Codespace setup complete."
+echo "Dynatrace API URL is: $DT_BASE_URL"
+
+##############################################################################
+# Start Application
+##############################################################################
+
+echo "Launching Streamlit application..."
+streamlit run app.py
