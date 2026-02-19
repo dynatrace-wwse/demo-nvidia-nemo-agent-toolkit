@@ -13,24 +13,74 @@ customFunction(){
 
 }
 
+startApp(){
+  printInfoSection "Starting application"
+  printInfo "Launching Streamlit application..."
+  streamlit run app.py
+}
+
+setUpPythonEnv(){
+
+  printInfoSection "Setting up Python Environment"
+  
+  printInfo "Downloading & installing Python project manager Astral UV..."
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+
+  source $HOME/.local/bin/env
+  
+  printInfo "Creating and activating Python virtual environment..."
+  uv venv --python 3.13 .venv
+  source .venv/bin/activate
+
+  printInfo "Installing Python dependencies..."
+  # Increase UV HTTP timeout to handle slower connections
+  export UV_HTTP_TIMEOUT=300
+  # Suppress UV hardlink warning for cross-filesystem operations
+  export UV_LINK_MODE=copy
+  if ! uv pip install -r requirements.txt; then
+    printError "Failed to install Python dependencies. "
+    printError "Please check requirements.txt and try again."
+    return 1
+  fi
+
+  printInfo "Updating Python configuration files..."
+  python update_config.py build
+}
+
+startOtelCollector(){
+
+  printInfoSection "Starting OpenTelemetry Collector"
+
+  if [ -z "$OTEL_OTLP_ENDPOINT" ] || [ "$OTEL_OTLP_ENDPOINT" = "null" ]; then
+    export OTEL_OTLP_ENDPOINT="http://localhost:4318"
+  fi
+  printInfo "Setting OTEL_OTLP_ENDPOINT=$OTEL_OTLP_ENDPOINT"
+  echo "export OTEL_OTLP_ENDPOINT=\"$OTEL_OTLP_ENDPOINT\"" >> ~/.bashrc
+
+  ##############################################################################
+  # Start Otel Collector
+  ##############################################################################
+  printInfo "Starting up Otel Collector..."
+  cd /workspaces/demo-nvidia-nemo-agent-toolkit/otel
+  ./start-otel.sh
+  cd /workspaces/demo-nvidia-nemo-agent-toolkit
+}
+
 verifyEnvironmentVars(){
+  printInfoSection "Verifying Environment Variables"
+
   # Adjust to build, brev or local
-if [ -z "$APP_MODE" ] || [ "$APP_MODE" = "null" ]; then
-  export APP_MODE=build
-fi
-# Validate APP_MODE is one of the allowed values
-if [ "$APP_MODE" != "local" ] && [ "$APP_MODE" != "brev" ] && [ "$APP_MODE" != "build" ]; then
-  echo "Error ***************************************************************"
-  echo "Error ***************************************************************"
-  echo ""
-  echo "Error: APP_MODE must be 'local', 'brev', or 'build'."
-  echo "Current value: $APP_MODE"
-  echo ""
-  echo "Error ***************************************************************"
-  echo "Error ***************************************************************"
-  return 1
-fi
-echo "APP_MODE is set to: $APP_MODE"
+  if [ -z "$APP_MODE" ] || [ "$APP_MODE" = "null" ]; then
+    export APP_MODE=build
+  fi
+
+  # Validate APP_MODE is one of the allowed values
+  if [ "$APP_MODE" != "local" ] && [ "$APP_MODE" != "brev" ] && [ "$APP_MODE" != "build" ]; then
+    printError "APP_MODE must be 'local', 'brev', or 'build'."
+    printError "Current value: $APP_MODE"
+    return 1
+  fi
+  printInfo "APP_MODE is set to: $APP_MODE"
 
 ##############################################################################
 # Setup Environment Variables
@@ -40,21 +90,15 @@ echo "APP_MODE is set to: $APP_MODE"
 # Leave blank if not running a workshop
 WORKSHOP_URL=
 if [ "$WORKSHOP_URL" ] ; then
-  echo "Getting the workshop environment settings..."
+  printInfoSection "Getting workshop environment settings"
 
   # Verify that environment variables were retrieved successfully
   if [ -z "$WORKSHOP_PASSWORD" ] || [ "$WORKSHOP_PASSWORD" = "null" ]; then
-    echo "Error ***************************************************************"
-    echo "Error ***************************************************************"
-    echo ""
-    echo "Error: WORKSHOP_PASSWORD is not set or is null."
-    echo "Please check your WORKSHOP_PASSWORD and try again."
-    echo ""
-    echo "Error ***************************************************************"
-    echo "Error ***************************************************************"
+    printError "WORKSHOP_PASSWORD is not set or is null."
+    printError "Please check your WORKSHOP_PASSWORD and try again."
     return 1
   fi
-  echo "You entered a WORKSHOP_PASSWORD of: ${WORKSHOP_PASSWORD}"
+  printInfo "WORKSHOP_PASSWORD detected."
 
   export DT_BASE_URL=$(curl -s -X POST $WORKSHOP_URL/dynatrace-url \
     -H "Content-Type: application/json" \
@@ -95,22 +139,16 @@ fi
 
 # get the NVIDIA model endpoints if in brev or local mode
 if [ "$APP_MODE" = "brev" ] || [ "$APP_MODE" = "local" ]  ; then
-  echo "Setting NVIDIA_MODEL_ENDPOINTs for $APP_MODE mode..."
+  printInfoSection "Setting NVIDIA model endpoints for $APP_MODE mode"
 
   if [ -z "$NVIDIA_MODEL_ENDPOINT_8001" ] || [ "$NVIDIA_MODEL_ENDPOINT_8001" = "null" ]; then
-    echo "Error ***************************************************************"
-    echo "Error ***************************************************************"
-    echo ""
-    echo "Error: Failed to retrieve NVIDIA_MODEL_ENDPOINT_8001."
-    echo ""
-    echo "Error ***************************************************************"
-    echo "Error ***************************************************************"
+    printError "Failed to retrieve NVIDIA_MODEL_ENDPOINT_8001."
     return 1
   fi
-  echo "NVIDIA_MODEL_ENDPOINT_8001=$NVIDIA_MODEL_ENDPOINT_8001"
-  echo "NVIDIA_MODEL_ENDPOINT_8002=$NVIDIA_MODEL_ENDPOINT_8002"
-  echo "NVIDIA_MODEL_ENDPOINT_8003=$NVIDIA_MODEL_ENDPOINT_8003"
-  echo "NVIDIA_MODEL_ENDPOINT_8004=$NVIDIA_MODEL_ENDPOINT_8004"
+  printInfo "NVIDIA_MODEL_ENDPOINT_8001=$NVIDIA_MODEL_ENDPOINT_8001"
+  printInfo "NVIDIA_MODEL_ENDPOINT_8002=$NVIDIA_MODEL_ENDPOINT_8002"
+  printInfo "NVIDIA_MODEL_ENDPOINT_8003=$NVIDIA_MODEL_ENDPOINT_8003"
+  printInfo "NVIDIA_MODEL_ENDPOINT_8004=$NVIDIA_MODEL_ENDPOINT_8004"
   echo "export NVIDIA_MODEL_ENDPOINT_8001=\"$NVIDIA_MODEL_ENDPOINT_8001\"" >> ~/.bashrc
   echo "export NVIDIA_MODEL_ENDPOINT_8002=\"$NVIDIA_MODEL_ENDPOINT_8002\"" >> ~/.bashrc
   echo "export NVIDIA_MODEL_ENDPOINT_8003=\"$NVIDIA_MODEL_ENDPOINT_8003\"" >> ~/.bashrc
@@ -120,110 +158,41 @@ fi
 ##TODO: why adding the vars to .bashrc? for new terminals? we use zsh in the framework.
 # get using the NVIDIA Build APIs, then get the API key
 if [ "$APP_MODE" = "build" ] ; then
-  echo "Setting NVIDIA_API_KEY"
+  printInfoSection "Setting NVIDIA API key"
   if [ -z "$NVIDIA_API_KEY" ] || [ "$NVIDIA_API_KEY" = "null" ]; then
-    echo "Error ***************************************************************"
-    echo "Error ***************************************************************"
-    echo ""
-    echo "Error: Failed to retrieve NVIDIA_API_KEY. "
-    echo ""
-    echo "Error ***************************************************************"
-    echo "Error ***************************************************************"
+    printError "Failed to retrieve NVIDIA_API_KEY."
     return 1
   fi
   echo "export NVIDIA_API_KEY=\"$NVIDIA_API_KEY\"" >> ~/.bashrc
 fi
 
-echo "Setting Dynatrace DT_BASE_URL=$DT_BASE_URL"
+printInfoSection "Setting Dynatrace configuration"
+printInfo "Setting Dynatrace DT_BASE_URL=$DT_BASE_URL"
 if [ -z "$DT_BASE_URL" ] || [ "$DT_BASE_URL" = "null" ]; then
-  echo "Error ***************************************************************"
-  echo "Error ***************************************************************"
-  echo ""
-  echo "Error: Failed to retrieve DT_BASE_URL. "
-  echo ""
-  echo "Error ***************************************************************"
-  echo "Error ***************************************************************"
+  printError "Failed to retrieve DT_BASE_URL."
   return 1
 fi
 if [ -z "$DT_API_TOKEN" ] || [ "$DT_API_TOKEN" = "null" ]; then
-  echo "Error ***************************************************************"
-  echo "Error ***************************************************************"
-  echo ""
-  echo "Error: Failed to retrieve DT_API_TOKEN. "
-  echo ""
-  echo "Error ***************************************************************"
-  echo "Error ***************************************************************"
+  printError "Failed to retrieve DT_API_TOKEN."
   return 1
 fi
 echo "export DT_BASE_URL=\"$DT_BASE_URL\"" >> ~/.bashrc
 echo "export DT_API_TOKEN=\"$DT_API_TOKEN\"" >> ~/.bashrc
 
-echo "Setting TAVILY_API_KEY"
+printInfoSection "Setting Tavily API key"
 if [ -z "$TAVILY_API_KEY" ] || [ "$TAVILY_API_KEY" = "null" ]; then
-  echo "Error ***************************************************************"
-  echo "Error ***************************************************************"
-  echo ""
-  echo "Error: Failed to retrieve TAVILY_API_KEY. "
-  echo ""
-  echo "Error ***************************************************************"
-  echo "Error ***************************************************************"
+  printError "Failed to retrieve TAVILY_API_KEY."
   return 1
 fi
 echo "export TAVILY_API_KEY=\"$TAVILY_API_KEY\"" >> ~/.bashrc
 
-if [ -z "$OTEL_OTLP_ENDPOINT" ] || [ "$OTEL_OTLP_ENDPOINT" = "null" ]; then
-  export OTEL_OTLP_ENDPOINT="http://localhost:4318"
-fi
-echo "Setting OTEL_OTLP_ENDPOINT=$OTEL_OTLP_ENDPOINT"
-echo "export OTEL_OTLP_ENDPOINT=\"$OTEL_OTLP_ENDPOINT\"" >> ~/.bashrc
 
-##############################################################################
-# Start Otel Collector
-##############################################################################
-echo "Starting up Otel Collector..."
-cd /workspaces/demo-nvidia-nemo-agent-toolkit/otel
-./start-otel.sh
-cd /workspaces/demo-nvidia-nemo-agent-toolkit
+startOtelCollector
 
-##############################################################################
-# Setup Python Environment
-##############################################################################
-echo "Setting up Python environment..."
-curl -LsSf https://astral.sh/uv/install.sh | sh
+setUpPythonEnv
 
-echo "Creating and activating Python virtual environment..."
-uv venv --python 3.13 .venv
-source .venv/bin/activate
+printInfo "Codespace setup complete."
+printInfo "Dynatrace API URL is: $DT_BASE_URL"
 
-echo "Installing Python dependencies..."
-# Increase UV HTTP timeout to handle slower connections
-export UV_HTTP_TIMEOUT=300
-# Suppress UV hardlink warning for cross-filesystem operations
-export UV_LINK_MODE=copy
-if ! uv pip install -r requirements.txt; then
-  echo "Error ***************************************************************"
-  echo "Error ***************************************************************"
-  echo ""
-  echo "Error: Failed to install Python dependencies. "
-  echo "Please check requirements.txt and try again."
-  echo ""
-  echo "Error ***************************************************************"
-  echo "Error ***************************************************************"
-  return 1
-fi
-
-echo "Updating configuration files..."
-python update_config.py build
-
-echo ""
-echo "Codespace setup complete."
-echo "Dynatrace API URL is: $DT_BASE_URL"
-
-##############################################################################
-# Start Application
-##############################################################################
-
-echo "Launching Streamlit application..."
-streamlit run app.py
-
+startApp
 }
