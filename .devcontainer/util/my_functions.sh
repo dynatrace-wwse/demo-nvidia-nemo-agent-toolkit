@@ -15,20 +15,72 @@ customFunction(){
 
 }
 
+APP_LOG="$APP_DIR/app.log"
+APP_PID_FILE="$APP_DIR/app.pid"
+
 startApp(){
   printInfoSection "Starting application"
-  printInfo "Launching Streamlit application..."
+
+  # Check if already running
+  if [ -f "$APP_PID_FILE" ] && kill -0 "$(cat "$APP_PID_FILE")" 2>/dev/null; then
+    printInfo "Application is already running (PID $(cat "$APP_PID_FILE"))."
+    return 0
+  fi
+
+  printInfo "Launching Streamlit application in the background..."
 
   if [ -x "$REPO_PATH/.venv/bin/python3" ]; then
-    "$REPO_PATH/.venv/bin/python3" -m streamlit run "$APP_DIR/app.py"
+    local CMD="$REPO_PATH/.venv/bin/python3"
   elif command -v python3 >/dev/null 2>&1; then
-    python3 -m streamlit run "$APP_DIR/app.py"
-  elif command -v streamlit >/dev/null 2>&1; then
-    streamlit run "$APP_DIR/app.py"
+    local CMD="python3"
   else
     printError "Could not find Python/Streamlit runtime. Run setUpPythonEnv first."
     return 1
   fi
+
+  nohup "$CMD" -m streamlit run "$APP_DIR/app.py" > "$APP_LOG" 2>&1 &
+  local PID=$!
+  echo "$PID" > "$APP_PID_FILE"
+
+  printInfo "Application started with PID $PID"
+  printInfo "Logs: $APP_LOG"
+  printInfo "Stop with: stopApp"
+}
+
+stopApp(){
+  printInfoSection "Stopping application"
+
+  if [ ! -f "$APP_PID_FILE" ]; then
+    printError "PID file not found. Is the application running?"
+    return 1
+  fi
+
+  local PID
+  PID=$(cat "$APP_PID_FILE")
+
+  if kill -0 "$PID" 2>/dev/null; then
+    kill "$PID"
+    printInfo "Sent SIGTERM to process $PID"
+    # Wait briefly, then force-kill if still alive
+    sleep 2
+    if kill -0 "$PID" 2>/dev/null; then
+      kill -9 "$PID"
+      printInfo "Force-killed process $PID"
+    fi
+  else
+    printInfo "Process $PID is not running."
+  fi
+
+  rm -f "$APP_PID_FILE"
+  printInfo "Application stopped."
+}
+
+appLogs(){
+  if [ ! -f "$APP_LOG" ]; then
+    printError "Log file not found: $APP_LOG"
+    return 1
+  fi
+  less +F "$APP_LOG"
 }
 
 setUpPythonEnv(){
