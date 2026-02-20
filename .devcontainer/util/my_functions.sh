@@ -82,9 +82,9 @@ startOtelCollector(){
   # Start Otel Collector
   ##############################################################################
   printInfo "Starting up Otel Collector..."
-  cd /workspaces/demo-agentic-ai-with-nvidia/otel
+  cd $REPO_PATH/otel
   ./start-otel.sh
-  cd /workspaces/demo-agentic-ai-with-nvidia
+  cd $REPO_PATH
 }
 
 verifyEnvironmentVars(){
