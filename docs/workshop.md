@@ -46,7 +46,7 @@ With Dynatrace monitoring, you'll track real-time performance and cost, follow e
 If you need to restart the sample App, then run the following commands
 
 ```bash
-cd /workspaces/demo-nvidia-nemo-agent-toolkit
+cd /workspaces/demo-agentic-ai-with-nvidia
 source .venv/bin/activate
 streamlit run app/app.py
 ```

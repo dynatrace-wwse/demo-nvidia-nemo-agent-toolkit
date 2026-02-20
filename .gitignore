@@ -275,3 +275,7 @@ pip-delete-this-directory.txt
 .env
 bak/
 config.yml
+
+# App PID
+app.pid
+

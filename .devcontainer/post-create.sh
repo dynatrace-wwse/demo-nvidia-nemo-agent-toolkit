@@ -13,6 +13,8 @@ setUpPythonEnv
 
 startApp
 
+initApp
+
 finalizePostCreation
 
 printInfoSection "Your dev container finished creating"

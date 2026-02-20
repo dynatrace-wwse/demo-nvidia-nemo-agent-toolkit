@@ -2,7 +2,7 @@
 
 
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/dynatrace-wwse/demo-nvidia-nemo-agent-toolkit){target="_blank"}
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/dynatrace-wwse/demo-agentic-ai-with-nvidia){target="_blank"}
 
 TODO: Add the sizing & secrets needed.
 

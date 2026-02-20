@@ -6,11 +6,33 @@
 [x] clean and move images and docs to folder
 [x] add RUM 
 [x] move docs to gh pages
+[X] Rename repo to demo-agentic-ai-with-nvidia
+[X] add integration tests: basic tests added. 
+[x] trim to 2 cores
 
-[ ] add integration tests
-[ ] refactor tenant ENV var
-[ ] protect branch with git strategy
-[ ] version policy
+[ ] Adapt greeting to no Kubernetes Cluster, same as Azure WebApp Repo.
+
+
+Documentation
+[ ] have better guidance, like this  https://dynatrace-wwse.github.io/enablement-gen-ai-llm-observability/ with explanations, should be self-service. bring more customers and prospects! we should wow them.
+[ ] Documentation on getting the token,
+  - LLM token better like this: https://dynatrace-wwse.github.io/enablement-gen-ai-llm-observability/2-getting-started/
+
+ Refactor Vars to 
+  [ ] "DT_ENVIRONMENT": {"description": "URL to your Dynatrace Platform eg. https://abc123.apps.dynatrace.com or for sprint -> https://abc123.sprint.apps.dynatracelabs.com"
+  [ ] "DT_LLM_TOKEN": {"description": "Dynatrace API token with these permissions: Ingest events, Ingest logs, Ingest metrics, Ingest OpenTelemetry traces"
+  [ ] clear writing to bashrc and move -> .zshrc or .env
+
+Improve Dev Experience
+[x] Start app in backgrpund and manage process with PID (release terminal)
+[x] Stop app with PID
+[x] Init app
+[x] Pipe log std errand std output to logfile
+[x] function to read App log with "less +F" 
+[x] function to read Otel log with "less +F"
+
+[ ] Protect branch with git strategy
+[ ] Version policy
 
 -->
 
@@ -18,11 +40,11 @@
 [![Davis CoPilot](https://img.shields.io/badge/Davis%20CoPilot-AI%20Powered-purple?logo=dynatrace&logoColor=white)](https://dynatrace-wwse.github.io/codespaces-framework/dynatrace-integration/#mcp-server-integration)
 [![dt-badge](https://img.shields.io/badge/Powered_by-DT_Enablement-8A2BE2?logo=dynatrace)](https://dynatrace-wwse.github.io/codespaces-framework/)
 [![Downloads](https://img.shields.io/docker/pulls/shinojosa/dt-enablement?logo=docker)](https://hub.docker.com/r/shinojosa/dt-enablement)
-![Integration tests](https://github.com/dynatrace-wwse/demo-nvidia-nemo-agent-toolkit/actions/workflows/integration-tests.yaml/badge.svg)
-[![Version](https://img.shields.io/github/v/release/dynatrace-wwse/demo-nvidia-nemo-agent-toolkit?color=blueviolet)](https://github.com/dynatrace-wwse/demo-nvidia-nemo-agent-toolkit/releases)
-[![Commits](https://img.shields.io/github/commits-since/dynatrace-wwse/demo-nvidia-nemo-agent-toolkit/latest?color=ff69b4&include_prereleases)](https://github.com/dynatrace-wwse/demo-nvidia-nemo-agent-toolkit/graphs/commit-activity)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg?color=green)](https://github.com/dynatrace-wwse/demo-nvidia-nemo-agent-toolkit/blob/main/LICENSE)
-[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-green)](https://dynatrace-wwse.github.io/demo-nvidia-nemo-agent-toolkit/)
+![Integration tests](https://github.com/dynatrace-wwse/demo-agentic-ai-with-nvidia/actions/workflows/integration-tests.yaml/badge.svg)
+[![Version](https://img.shields.io/github/v/release/dynatrace-wwse/demo-agentic-ai-with-nvidia?color=blueviolet)](https://github.com/dynatrace-wwse/demo-agentic-ai-with-nvidia/releases)
+[![Commits](https://img.shields.io/github/commits-since/dynatrace-wwse/demo-agentic-ai-with-nvidia/latest?color=ff69b4&include_prereleases)](https://github.com/dynatrace-wwse/demo-agentic-ai-with-nvidia/graphs/commit-activity)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg?color=green)](https://github.com/dynatrace-wwse/demo-agentic-ai-with-nvidia/blob/main/LICENSE)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-green)](https://dynatrace-wwse.github.io/demo-agentic-ai-with-nvidia/)
 
 ___
 
@@ -52,4 +74,4 @@ Use this README to understand the demo scope, architecture, and expected outcome
 
 ## 📚 Documentation
 
-For setup, usage, and implementation details, visit the [GitHub Pages documentation](https://dynatrace-wwse.github.io/demo-nvidia-nemo-agent-toolkit)
+For setup, usage, and implementation details, visit the [GitHub Pages documentation](https://dynatrace-wwse.github.io/demo-agentic-ai-with-nvidia)
